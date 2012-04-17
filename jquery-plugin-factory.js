@@ -53,9 +53,8 @@ function jQueryPluginFactory( $, name, methods, getters ){
       // Init the plugin if first time
       if( !plugin ){
         plugin = new Plugin($this);
-        $this.data('plugin-'+name, plugin);
-        if(plugin._init){
-          plugin._init.apply(plugin, args);
+        if(!plugin._init || plugin._init.apply(plugin, args) !== false){
+          $this.data('plugin-'+name, plugin);
         }
         
       // call a method
