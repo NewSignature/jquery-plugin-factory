@@ -49,6 +49,8 @@ it the factory function:
 4. The 'this' object is for the each instance of the plugin.
 5. To get the element that the plugin is for, use this.element to get it.
 
+If during the `_init` method you wish to cancel the creation of that plugin instances, return `false`.
+
 ### Parameters
 1. $ - the jQuery instance to add the plugin to
 2. name - the name to call the plugin with
