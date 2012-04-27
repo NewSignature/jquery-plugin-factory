@@ -27,8 +27,9 @@
  *   Any method name that starts with an underscore will be private, it will not be exposed.
  *   The method named '_init' will be called when initializing.
  * @param getters - an array of methods that return values
+ * @param apiObject - true if to create an API factory method '_createApiObject'.
  */
-function jQueryPluginFactory( $, name, methods, getters ){
+function jQueryPluginFactory( $, name, methods, getters, apiObject  ){
   getters = getters instanceof Array ? getters : [];
   var getters_obj = {};
   for(var i=0; i<getters.length; i++){
@@ -41,6 +42,40 @@ function jQueryPluginFactory( $, name, methods, getters ){
     this.element = element;
   };
   Plugin.prototype = methods;
+  
+  // Add a factory method to create an API object
+  if( apiObject ) {
+    Plugin.prototype._createApiObject = function() {
+      var api = {};
+    
+      // add public methods
+      for(var m in this){
+        if(m.charAt(0) != '_' && typeof this[m] == 'function'){
+          api[m] = $.proxy( this, m );
+        }
+      };
+      
+      // create a data store method
+      api._data = {};
+      api.data = function( key, value ){
+        if( value === undefined ){
+          return this._data[key];
+        }
+        
+        if( value === null ){
+          delete this._data[key];
+        }
+        
+        this._data[key] = value;
+        return this._data[key];
+      }
+      
+      // attach the container element
+      api.element = this.element;
+      
+      return api;
+    }
+  }
   
   // Assign the plugin
   $.fn[name] = function(){
